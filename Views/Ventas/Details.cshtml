@@ -1,0 +1,54 @@
+﻿@model Venta
+
+@{
+    ViewData["Title"] = "Detalles de Venta";
+}
+
+<h2>Detalles de Venta #@Model.Id</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <p><strong>ID:</strong> @Model.Id</p>
+                <p><strong>Fecha:</strong> @Model.Fecha.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+            <div class="col-md-4">
+                <p><strong>Cliente:</strong> @(Model.Cliente?.Nombre ?? "Sin cliente")</p>
+            </div>
+            <div class="col-md-4">
+                <p><strong>Total:</strong> @Model.Total.ToString("C")</p>
+                <p><strong>Recibido:</strong> @Model.Recibido.ToString("C")</p>
+                <p><strong>Cambio:</strong> @Model.Cambio.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Productos</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Detalles != null)
+        {
+            @foreach (var detalle in Model.Detalles)
+            {
+                <tr>
+                    <td>@(detalle.Producto?.Nombre ?? "Sin producto")</td>
+                    <td>@detalle.Cantidad</td>
+                    <td>@detalle.Precio.ToString("C")</td>
+                    <td>@detalle.Subtotal.ToString("C")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>

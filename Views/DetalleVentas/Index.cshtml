@@ -1,0 +1,36 @@
+﻿@model List<DetalleVenta>
+
+@{
+    ViewData["Title"] = "Lista de Detalles de Venta";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Detalles de Venta</h2>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Venta</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>Venta #@item.VentaId</td>
+                <td>@(item.Producto?.Nombre ?? "Sin producto")</td>
+                <td>@item.Cantidad</td>
+                <td>@item.Precio.ToString("C")</td>
+                <td>@item.Subtotal.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>

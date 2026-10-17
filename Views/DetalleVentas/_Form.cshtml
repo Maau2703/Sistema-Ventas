@@ -1,0 +1,29 @@
+﻿@model DetalleVenta
+
+<div class="mb-3">
+    <label asp-for="VentaId" class="form-label">Venta</label>
+    <select asp-for="VentaId" asp-items="ViewBag.VentaId" class="form-select">
+        <option value="">-- Seleccione una venta --</option>
+    </select>
+    <span asp-validation-for="VentaId" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="ProductoId" class="form-label">Producto</label>
+    <select asp-for="ProductoId" asp-items="ViewBag.ProductoId" class="form-select">
+        <option value="">-- Seleccione un producto --</option>
+    </select>
+    <span asp-validation-for="ProductoId" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Cantidad" class="form-label">Cantidad</label>
+    <input asp-for="Cantidad" class="form-control" type="number" />
+    <span asp-validation-for="Cantidad" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Precio" class="form-label">Precio Unitario</label>
+    <input asp-for="Precio" class="form-control" type="number" step="0.01" />
+    <span asp-validation-for="Precio" class="text-danger"></span>
+</div>

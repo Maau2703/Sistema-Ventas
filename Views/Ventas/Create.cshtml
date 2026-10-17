@@ -1,0 +1,397 @@
+﻿@{
+    ViewData["Title"] = "Registro de Venta";
+}
+
+<h2 style="margin-bottom: 30px;">Registro de Venta</h2>
+
+<form id="formVenta" method="post" asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <input type="text" class="form-control" id="fechaActual" readonly />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Buscar cliente (nombre o celular)</strong></label>
+                    <input type="text" class="form-control" id="buscarCliente" 
+                           placeholder="Escriba y presione Enter o Tab..." 
+                           autocomplete="off" />
+                        <button class="btn btn-success" type="button" 
+                            data-bs-toggle="modal" data-bs-target="#modalCliente">
+                            Registrar cliente
+                        </button>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Cliente de esta venta</strong></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="clienteSeleccionado" 
+                               placeholder="Sin cliente" readonly />
+                        <input type="hidden" id="clienteId" name="ClienteId" />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3"><strong>2. Productos</strong></h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label"><strong>Buscar producto</strong></label>
+                    <input type="text" class="form-control" id="buscarProducto" 
+                           placeholder="Escriba parte del nombre..." autocomplete="off" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><strong>Precio</strong></label>
+                    <input type="text" class="form-control" id="precioProducto" readonly />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><strong>Cantidad</strong></label>
+                    <input type="number" class="form-control" id="cantidadProducto" 
+                           value="1" min="1" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-success w-100" id="btnAgregarProducto">
+                        + Agregar
+                    </button>
+                </div>
+            </div>
+
+            <table class="table table-bordered table-striped" id="tablaProductos">
+                <thead class="table-light">
+                    <tr>
+                        <th><strong>#</strong></th>
+                        <th><strong>Producto</strong></th>
+                        <th><strong>Precio</strong></th>
+                        <th><strong>Cantidad</strong></th>
+                        <th><strong>Subtotal</strong></th>
+                        <th><strong>Acción</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div id="sinProductos" class="text-center text-muted py-3">
+                Aún no se agregó productos
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 offset-md-3">
+                    <div class="border p-3">
+                        <h5><strong>TOTAL A PAGAR</strong></h5>
+                        <h3 class="text-end" id="totalPagar">Bs 0.00</h3>
+                        <input type="hidden" id="totalVenta" name="Total" value="0" />
+                        
+                        <div class="mt-3">
+                            <label class="form-label"><strong>Monto recibido</strong></label>
+                            <input type="number" class="form-control" id="montoRecibido" 
+                                   name="Recibido" step="0.01" min="0" required />
+                        </div>
+                        
+                        <div class="mt-2">
+                            <label class="form-label"><strong>Cambio</strong></label>
+                            <input type="text" class="form-control" id="cambio" readonly />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end mb-4">
+        <button type="submit" class="btn btn-primary" id="btnRegistrarVenta">
+            Registrar venta
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </div>
+
+    <div id="detallesVenta"></div>
+</form>
+
+<div class="modal fade" id="modalCliente" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Nuevo Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNuevoCliente">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nuevoClienteNombre" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cédula</label>
+                        <input type="text" class="form-control" id="nuevoClienteCedula" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="nuevoClienteTelefono" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarCliente">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .autocomplete-list {
+            position: absolute;
+            z-index: 1000;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        .autocomplete-item:hover {
+            background-color: #f0f0f0;
+        }
+        .autocomplete-wrapper {
+            position: relative;
+        }
+    </style>
+
+    <script>
+        let productosAgregados = [];
+        let contadorProductos = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fecha = new Date();
+            const fechaFormateada = fecha.toLocaleString('es-BO', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('fechaActual').value = fechaFormateada;
+        });
+
+        const buscarClienteInput = document.getElementById('buscarCliente');
+        const clienteLista = document.createElement('div');
+        clienteLista.className = 'autocomplete-list';
+        clienteLista.style.display = 'none';
+        buscarClienteInput.parentElement.style.position = 'relative';
+        buscarClienteInput.parentElement.appendChild(clienteLista);
+
+        buscarClienteInput.addEventListener('input', function() {
+            const texto = this.value.trim();
+            if (texto.length < 2) {
+                clienteLista.style.display = 'none';
+                return;
+            }
+
+            fetch(`/api/clientes/buscar?search=${encodeURIComponent(texto)}`)
+                .then(response => response.json())
+                .then(data => {
+                    clienteLista.innerHTML = '';
+                    if (data.length === 0) {
+                        clienteLista.style.display = 'none';
+                        return;
+                    }
+
+                    data.forEach(cliente => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.textContent = `${cliente.nombre} (ID: ${cliente.id})`;
+                        item.addEventListener('click', function() {
+                            document.getElementById('clienteSeleccionado').value = 
+                                `${cliente.nombre} (ID: ${cliente.id})`;
+                            document.getElementById('clienteId').value = cliente.id;
+                            buscarClienteInput.value = '';
+                            clienteLista.style.display = 'none';
+                        });
+                        clienteLista.appendChild(item);
+                    });
+
+                    clienteLista.style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!buscarClienteInput.contains(e.target) && !clienteLista.contains(e.target)) {
+                clienteLista.style.display = 'none';
+            }
+        });
+
+        const buscarProductoInput = document.getElementById('buscarProducto');
+        const productoLista = document.createElement('div');
+        productoLista.className = 'autocomplete-list';
+        productoLista.style.display = 'none';
+        buscarProductoInput.parentElement.style.position = 'relative';
+        buscarProductoInput.parentElement.appendChild(productoLista);
+
+        let productoSeleccionado = null;
+
+        buscarProductoInput.addEventListener('input', function() {
+            const texto = this.value.trim();
+            if (texto.length < 2) {
+                productoLista.style.display = 'none';
+                return;
+            }
+
+            fetch(`/api/productos/buscar?search=${encodeURIComponent(texto)}`)
+                .then(response => response.json())
+                .then(data => {
+                    productoLista.innerHTML = '';
+                    if (data.length === 0) {
+                        productoLista.style.display = 'none';
+                        return;
+                    }
+
+                    data.forEach(producto => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.textContent = `${producto.nombre} - Bs ${producto.precio.toFixed(2)} (Stock: ${producto.stock})`;
+                        item.addEventListener('click', function() {
+                            productoSeleccionado = producto;
+                            buscarProductoInput.value = producto.nombre;
+                            document.getElementById('precioProducto').value = producto.precio.toFixed(2);
+                            productoLista.style.display = 'none';
+                        });
+                        productoLista.appendChild(item);
+                    });
+
+                    productoLista.style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!buscarProductoInput.contains(e.target) && !productoLista.contains(e.target)) {
+                productoLista.style.display = 'none';
+            }
+        });
+
+        document.getElementById('btnAgregarProducto').addEventListener('click', function() {
+            if (!productoSeleccionado) {
+                alert('Seleccione un producto de la lista');
+                return;
+            }
+
+            const cantidad = parseInt(document.getElementById('cantidadProducto').value) || 1;
+            const subtotal = productoSeleccionado.precio * cantidad;
+            contadorProductos++;
+
+            const producto = {
+                id: contadorProductos,
+                productoId: productoSeleccionado.id,
+                nombre: productoSeleccionado.nombre,
+                precio: productoSeleccionado.precio,
+                cantidad: cantidad,
+                subtotal: subtotal
+            };
+
+            productosAgregados.push(producto);
+            actualizarTablaProductos();
+            calcularTotal();
+
+            // Limpiar
+            buscarProductoInput.value = '';
+            document.getElementById('precioProducto').value = '';
+            document.getElementById('cantidadProducto').value = '1';
+            productoSeleccionado = null;
+        });
+
+        function actualizarTablaProductos() {
+            const tbody = document.querySelector('#tablaProductos tbody');
+            tbody.innerHTML = '';
+
+            if (productosAgregados.length === 0) {
+                document.getElementById('sinProductos').style.display = 'block';
+                document.getElementById('tablaProductos').style.display = 'none';
+            } else {
+                document.getElementById('sinProductos').style.display = 'none';
+                document.getElementById('tablaProductos').style.display = 'table';
+
+                productosAgregados.forEach((prod, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${prod.nombre}</td>
+                        <td>Bs ${prod.precio.toFixed(2)}</td>
+                        <td>${prod.cantidad}</td>
+                        <td>Bs ${prod.subtotal.toFixed(2)}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" 
+                                    onclick="eliminarProducto(${prod.id})">
+                                Eliminar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+
+        function eliminarProducto(id) {
+            productosAgregados = productosAgregados.filter(p => p.id !== id);
+            actualizarTablaProductos();
+            calcularTotal();
+        }
+
+        function calcularTotal() {
+            const total = productosAgregados.reduce((sum, prod) => sum + prod.subtotal, 0);
+            document.getElementById('totalPagar').textContent = `Bs ${total.toFixed(2)}`;
+            document.getElementById('totalVenta').value = total;
+
+            const recibido = parseFloat(document.getElementById('montoRecibido').value) || 0;
+            const cambio = recibido - total;
+            document.getElementById('cambio').value = cambio >= 0 ? `Bs ${cambio.toFixed(2)}` : 'Bs 0.00';
+        }
+
+        document.getElementById('montoRecibido').addEventListener('input', calcularTotal);
+
+        document.getElementById('formVenta').addEventListener('submit', function(e) {
+            if (productosAgregados.length === 0) {
+                e.preventDefault();
+                alert('Debe agregar al menos un producto');
+                return;
+            }
+
+            if (!document.getElementById('clienteId').value) {
+                e.preventDefault();
+                alert('Debe seleccionar un cliente');
+                return;
+            }
+
+            const detallesDiv = document.getElementById('detallesVenta');
+            detallesDiv.innerHTML = '';
+
+            productosAgregados.forEach((prod, index) => {
+                detallesDiv.innerHTML += `
+                    <input type="hidden" name="Detalles[${index}].ProductoId" value="${prod.productoId}" />
+                    <input type="hidden" name="Detalles[${index}].Cantidad" value="${prod.cantidad}" />
+                    <input type="hidden" name="Detalles[${index}].Precio" value="${prod.precio}" />
+                `;
+            });
+        });
+    </script>
+}

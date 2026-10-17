@@ -1,0 +1,22 @@
+﻿@model Producto
+
+@{
+    ViewData["Title"] = "Eliminar Producto";
+}
+
+<h2>Eliminar Producto</h2>
+
+<div class="alert alert-warning">
+    <h4>¿Estás seguro que deseas eliminar este producto?</h4>
+    <p><strong>Nombre:</strong> @Model.Nombre</p>
+    <p><strong>Precio:</strong> @string.Format("{0:C}", Model.Precio)</p>
+    <p><strong>Categoría:</strong> @(Model.Categoria?.Nombre ?? "Sin categoría")</p>
+</div>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

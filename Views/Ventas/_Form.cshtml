@@ -1,0 +1,80 @@
+﻿@model Venta
+
+<div class="mb-3">
+    <label asp-for="ClienteId" class="form-label">Cliente</label>
+    <select asp-for="ClienteId" asp-items="ViewBag.ClienteId" class="form-select">
+        <option value="">-- Seleccione un cliente --</option>
+    </select>
+    <span asp-validation-for="ClienteId" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Recibido" class="form-label">Monto Recibido</label>
+    <input asp-for="Recibido" class="form-control" type="number" step="0.01" />
+    <span asp-validation-for="Recibido" class="text-danger"></span>
+</div>
+
+<hr />
+<h4>Detalles de la Venta</h4>
+<div id="detalles-container">
+    @if (Model.Detalles != null && Model.Detalles.Any())
+    {
+        for (int i = 0; i < Model.Detalles.Count; i++)
+        {
+            <div class="row mb-2 detalle-item">
+                <div class="col-md-4">
+                    <label class="form-label">Producto</label>
+                    <select asp-for="@Model.Detalles[i].ProductoId" asp-items="@(new SelectList(ViewBag.Productos, "Id", "Nombre"))" class="form-select">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Cantidad</label>
+                    <input asp-for="@Model.Detalles[i].Cantidad" class="form-control" type="number" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Precio</label>
+                    <input asp-for="@Model.Detalles[i].Precio" class="form-control" type="number" step="0.01" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.detalle-item').remove()">Quitar</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="agregarDetalle()">+ Agregar Producto</button>
+
+<script>
+    function agregarDetalle() {
+        const container = document.getElementById('detalles-container');
+        const index = container.children.length;
+        const html = `
+            <div class="row mb-2 detalle-item">
+                <div class="col-md-4">
+                    <label class="form-label">Producto</label>
+                    <select name="Detalles[${index}].ProductoId" class="form-select">
+                        <option value="">-- Seleccione --</option>
+                        @foreach (var p in ViewBag.Productos)
+                        {
+                            <option value="@p.Id">@p.Nombre</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Cantidad</label>
+                    <input name="Detalles[${index}].Cantidad" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Precio</label>
+                    <input name="Detalles[${index}].Precio" type="number" step="0.01" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.detalle-item').remove()">Quitar</button>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+</script>
