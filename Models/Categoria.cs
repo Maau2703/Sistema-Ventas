@@ -7,4 +7,6 @@ public class Categoria
     public string? Nombre { get; set; } = string.Empty;
     [JsonIgnore]
     public List<Producto> Productos { get; set; } = new();
+
+    //hola
 }
