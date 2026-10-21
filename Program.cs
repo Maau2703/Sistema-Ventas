@@ -23,9 +23,13 @@ builder.Services.AddControllersWithViews()
 
 // 2) Base de datos. El proveedor se cambia SOLO en esta línea.
 //    Ahora: SQLite (archivo local). Ver README, sección "Conexión a Turso".
-var dbPath = Environment.GetEnvironmentVariable("DB_PATH") ?? "ventas.db";
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+//var dbPath = Environment.GetEnvironmentVariable("DB_PATH") ?? "ventas.db";
+//builder.Services.AddDbContext<AppDbContext>(options =>
+    //options.UseSqlite($"Data Source={dbPath}"));
+   var dbPath = Environment.GetEnvironmentVariable("DB_PATH")
+        ?? Path.Combine(builder.Environment.ContentRootPath, "ventas_db");
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlite($"Data Source={dbPath}"));
 
 // 3) Railway entrega el puerto en la variable PORT
 var port = Environment.GetEnvironmentVariable("PORT");
@@ -33,6 +37,11 @@ if (!string.IsNullOrEmpty(port))
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();  //crea las tablas (y los datos inicales)
+}
 
 if (!app.Environment.IsDevelopment())
 {

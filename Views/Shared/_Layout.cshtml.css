@@ -46,3 +46,22 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+#graficoVentas {
+    max-height: 400px;
+}
+
+.list-group-item {
+    transition: background-color 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}

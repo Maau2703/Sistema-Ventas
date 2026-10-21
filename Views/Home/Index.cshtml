@@ -1,12 +1,204 @@
-﻿@{
-    ViewData["Title"] = "Inicio";
+﻿@model SistemaVentas.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="p-5 mb-4 bg-light rounded-3">
-    <h1 class="display-6">Sistema WEB de ventas</h1>
-    <p class="lead">Programacion WEB II</p>
-    <a class="btn btn-primary" asp-controller="Productos" asp-action="Index">Ver Productos</a>
-    <a class="btn btn-outline-secondary" asp-controller="Categorias" asp-action="Index">Ver Categorias</a>
-    <a class="btn btn-outline-secondary" asp-controller="Clientes" asp-action="Index">Ver Clientes</a>
-    <a class="btn btn-outline-secondary" asp-controller="Ventas" asp-action="Index">Ver Ventas</a>
+<!-- Cargar Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h2><i class="bi bi-speedometer2"></i> Panel de Control</h2>
+        <p class="text-muted">Resumen general del sistema de ventas</p>
+    </div>
+
+    <!-- SECCIÓN 1: TARJETAS DE KPIs -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+                <div class="stat-info">
+                    <h5>Ventas Totales</h5>
+                    <h3>@Model.TotalVentas.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-success">
+                <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                <div class="stat-info">
+                    <h5>Productos</h5>
+                    <h3>@Model.TotalProductos</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-info">
+                <div class="stat-icon"><i class="bi bi-people"></i></div>
+                <div class="stat-info">
+                    <h5>Clientes</h5>
+                    <h3>@Model.TotalClientes</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-danger">
+                <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="stat-info">
+                    <h5>Stock Bajo</h5>
+                    <h3>@Model.ProductosBajoStock</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: GRÁFICO Y ALERTAS -->
+    <div class="row g-4">
+        <!-- Gráfico -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-bar-chart"></i> Top 5 Productos Más Vendidos</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoVentas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas de Stock -->
+        <div class="col-lg-4">
+            <div class="card dashboard-card alert-card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Alertas de Stock</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.AlertasStock.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var alerta in Model.AlertasStock)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@alerta.Nombre</strong><br>
+                                        <small class="text-muted">@alerta.Categoria</small>
+                                    </div>
+                                    <span class="badge bg-danger rounded-pill">
+                                        @alerta.StockActual / @alerta.StockMinimo
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-success">
+                            <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">Todo el stock está en orden</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: ÚLTIMAS VENTAS -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-clock-history"></i> Últimas 5 Ventas</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.UltimasVentas.Any())
+                                {
+                                    @foreach (var venta in Model.UltimasVentas)
+                                    {
+                                        <tr>
+                                            <td>#@venta.Id</td>
+                                            <td>@venta.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@venta.Cliente</td>
+                                            <td class="text-end"><strong>@venta.Total.ToString("C")</strong></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            Aún no hay ventas registradas
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        const topProductos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopProductos));
+
+        const ctx = document.getElementById('graficoVentas').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: topProductos.map(p => p.nombre),
+                datasets: [{
+                    label: 'Unidades Vendidas',
+                    data: topProductos.map(p => p.cantidadVendida),
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
