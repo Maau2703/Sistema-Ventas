@@ -1,33 +1,30 @@
-name: Deploy a MonsterASP
+name: Deploy to MonsterASP
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      - name: Publicar
-        run: dotnet publish Sistema_ventas.csproj -c Release -o publish
+      - name: Publish project
+        run: dotnet publish -c Release -o ./publish
 
-      - name: Subir por FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          server: site100218.siteasp.net
+          username: site100218
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
           local-dir: ./publish/
           server-dir: /wwwroot/
-          exclude: |
-            */.git
-            */.git/**
-            */ventas.db
