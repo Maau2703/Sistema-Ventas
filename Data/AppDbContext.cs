@@ -1,10 +1,11 @@
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore; // <-- AGREGADO
 using SistemaVentas.Models;
 
 namespace SistemaVentas.Data;
 
-public class AppDbContext : DbContext
+// CAMBIO 1: Heredar de IdentityDbContext<ApplicationUser> en lugar de DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     
@@ -14,8 +15,12 @@ public class AppDbContext : DbContext
     public DbSet<Producto> Producto => Set<Producto>();
     public DbSet<Venta> Ventas => Set<Venta>();
     
+    // CAMBIO 2: Agregar el DbSet para los usuarios
+    public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // CAMBIO 3: Esta línea es OBLIGATORIA para que Identity cree sus tablas
         base.OnModelCreating(modelBuilder);
         
         modelBuilder.Entity<Categoria>().HasData(

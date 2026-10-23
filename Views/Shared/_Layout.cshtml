@@ -1,24 +1,57 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SistemaVentas</title>
 
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- Estilos locales del proyecto -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SistemaVentas.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     
     <style>
         body {
             background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
             margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        main {
+            flex: 1;
+        }
+        .footer {
+            background-color: #e9ecef;
+            margin-top: auto;
+        }
+        /* Estilo para el botón de logout para que parezca un enlace del navbar */
+        .btn-logout {
+            color: rgba(255,255,255,.7) !important;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .btn-logout:hover {
+            color: #fff !important;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -27,28 +60,70 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-cart-check"></i> SistemaVentas
+                    <i class="bi bi-cart-check-fill"></i> SistemaVentas
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Menú principal (Izquierda) -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-speedometer2"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Categorias" asp-action="Index">
+                                <i class="bi bi-tags"></i> Categorías
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Productos" asp-action="Index">
+                                <i class="bi bi-box-seam"></i> Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Clientes" asp-action="Index">
+                                <i class="bi bi-people"></i> Clientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Ventas" asp-action="Index">
+                                <i class="bi bi-receipt"></i> Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Reportes" asp-action="Index">
+                                <i class="bi bi-bar-chart-line"></i> Reportes
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Menú de Usuario (Derecha) -->
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Categorias" asp-action="Index">Categorías</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Productos" asp-action="Index">Productos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Clientes" asp-action="Index">Clientes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Ventas" asp-action="Index">Ventas</a>
-                        </li>
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-light">
+                                    <i class="bi bi-person-circle"></i> @UserManager.GetUserName(User)
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                                    <button type="submit" class="btn-logout">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Por si acaso alguien accede sin login, aunque el Program.cs lo redirige -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Iniciar Sesión</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -61,15 +136,16 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted mt-5">
+    <footer class="border-top footer text-muted">
         <div class="container text-center py-3">
-            &copy; @DateTime.Now.Year - SistemaVentas
+            &copy; @DateTime.Now.Year - Sistema de Ventas UPDS. Todos los derechos reservados.
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS desde CDN -->
+    <!-- Bootstrap 5 JS Bundle (incluye Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Scripts específicos de cada vista (como validación o gráficos) -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

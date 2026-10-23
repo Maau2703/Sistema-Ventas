@@ -1,0 +1,160 @@
+@{
+    ViewData["Title"] = "Reportes";
+}
+
+<h2 class="mb-4"><i class="bi bi-bar-chart-line"></i> Panel de Reportes</h2>
+
+<!-- Tarjetas de resumen -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-cash-stack text-primary" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Ventas Totales</small>
+                        <h4 class="mb-0">Bs @ViewBag.TotalVentas.ToString("N2")</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-box-seam text-success" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Productos</small>
+                        <h4 class="mb-0">@ViewBag.TotalProductos</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-info bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-people text-info" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Clientes</small>
+                        <h4 class="mb-0">@ViewBag.TotalClientes</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Stock Bajo</small>
+                        <h4 class="mb-0">@ViewBag.ProductosBajoStock</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Opciones de Reportes -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-receipt text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">Reporte de Ventas</h4>
+                        <small class="text-muted">Ventas por período con totales</small>
+                    </div>
+                </div>
+                <p class="text-muted">Genera un reporte detallado de todas las ventas en un rango de fechas específico, incluyendo cliente, fecha y total.</p>
+                <div class="d-flex gap-2">
+                    <a asp-action="Ventas" class="btn btn-primary">
+                        <i class="bi bi-eye"></i> Ver Reporte
+                    </a>
+                    <a asp-action="Ventas" class="btn btn-primary"><i class="bi bi-eye"></i> Ver Reporte</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-success bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-box-seam text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">Reporte de Inventario</h4>
+                        <small class="text-muted">Stock actual de todos los productos</small>
+                    </div>
+                </div>
+                <p class="text-muted">Lista completa de productos con su stock actual, precio y categoría. Identifica productos con stock bajo.</p>
+                <div class="d-flex gap-2">
+                    <a asp-action="Productos" class="btn btn-success">
+                        <i class="bi bi-eye"></i> Ver Reporte
+                    </a>
+                    <a asp-action="DescargarPDFProductos" class="btn btn-outline-danger">
+                        <i class="bi bi-file-pdf"></i> Descargar PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-trophy text-warning" style="font-size: 2rem;"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">Top 10 Productos</h4>
+                        <small class="text-muted">Productos más vendidos</small>
+                    </div>
+                </div>
+                <p class="text-muted">Ranking de los 10 productos más vendidos con cantidad y total vendido por cada uno.</p>
+                <a asp-action="TopProductos" class="btn btn-warning text-white">
+                    <i class="bi bi-eye"></i> Ver Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-info bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-graph-up text-info" style="font-size: 2rem;"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">Resumen General</h4>
+                        <small class="text-muted">Dashboard completo</small>
+                    </div>
+                </div>
+                <p class="text-muted">Vista general con todos los indicadores clave del negocio en tiempo real.</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-info text-white">
+                    <i class="bi bi-speedometer2"></i> Ir al Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
