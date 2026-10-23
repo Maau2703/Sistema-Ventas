@@ -27,3 +27,4 @@ jobs:
           username: site100218
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/
+          force-upload: true
