@@ -1,4 +1,4 @@
-name: Deploy to MonsterASP
+name: Deploy a MonsterASP.NET
 
 on:
   push:
@@ -6,25 +6,40 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Publish project
-        run: dotnet publish -c Release -o ./publish
+      - name: Restore, Build and Publish
+        run: |
+          dotnet restore
+          dotnet build --configuration Release --no-restore
+          dotnet publish -c Release -o ./publish --no-build
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: site100218.siteasp.net
-          username: site100218
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
           local-dir: ./publish/
-          force-upload: true
+          server-dir: /wwwroot/
+          security: strict
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            ventas_db.db
+            ventas_db.db-shm
+            ventas_db.db-wal
+            appsettings.Development.json
+            .env
