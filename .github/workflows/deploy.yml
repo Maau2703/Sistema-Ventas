@@ -25,15 +25,17 @@ jobs:
           dotnet publish -c Release -o ./publish --no-build
 
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
           local-dir: ./publish/
           server-dir: /wwwroot/
-          security: strict
+          # Esto ayuda a depurar si vuelve a fallar
+          log-level: verbose 
           exclude: |
             **/.git*
             **/.git*/**
